@@ -1,0 +1,10 @@
+{
+    "primaryKey": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "sharedSecret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "server": {
+        "storageMethod": "memory",
+        "slashTagName": "",
+        "hashSecret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "encryptionSecret": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+    }
+}

@@ -25,7 +25,7 @@ jobs:
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew tap wix/brew && brew install applesimutils
 
       - name: Run regtest setup
-        run: cd __tests__ && docker-compose up -d
+        run: cd __tests__/envriroment && docker-compose up -d
 
       - name: Wait for bitcoind
         timeout-minutes: 2

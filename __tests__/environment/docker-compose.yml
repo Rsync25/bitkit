@@ -46,6 +46,14 @@ services:
       - ELECTRS_DAEMON_P2P_ADDR=bitcoind:39388
       - ELECTRS_LOG_FILTERS=INFO
 
+  backup:
+    image: limpbrains/bitkit-backup-server:latest
+    restart: unless-stopped
+    expose:
+      - '3000'
+    volumes:
+      - './backup-server.json:/app/config/local.json'
+
 volumes:
   bitcoin_datadir:
   bitcoin_wallet_datadir:
