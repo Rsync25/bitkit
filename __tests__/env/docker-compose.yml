@@ -47,10 +47,8 @@ services:
       - ELECTRS_LOG_FILTERS=INFO
 
   backup:
-    image: limpbrains/bitkit-backup-server:latest
+    image: synonymsoft/bitkit-backup-server:v0.0.1
     restart: unless-stopped
-    expose:
-      - '3000'
     volumes:
       - './backup-server.json:/app/config/local.json'
 
