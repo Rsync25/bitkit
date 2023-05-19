@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 1
 
       - name: Run regtest setup
-        run: cd __tests__ && docker compose up -d
+        run: cd __tests__/env && docker compose up -d
 
       - name: Wait for bitcoind
         run: |
@@ -45,7 +45,7 @@ jobs:
         run: yarn install
 
       - name: Activate enviroment variables
-        run: cp .env.development.template .env
+        run: cp .env.test.template .env
 
       - name: Run Tests
         run: yarn test
