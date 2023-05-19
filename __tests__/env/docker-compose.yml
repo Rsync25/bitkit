@@ -52,6 +52,14 @@ services:
     volumes:
       - './backup-server.json:/app/config/local.json'
 
+  seeder:
+    image: synonymsoft/slashtag-seeding-server:v0.0.1
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    volumes:
+      - './seeding-server.json:/app/config/local.json'
+
 volumes:
   bitcoin_datadir:
   bitcoin_wallet_datadir:
