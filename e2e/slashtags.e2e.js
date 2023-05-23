@@ -16,10 +16,13 @@ const __DEV__ = process.env.DEBUG === 'true';
 describe('Profile and Contacts', () => {
 	let waitForElectrum;
 	let testProfiles;
+	let sdk;
 	const rpc = new BitcoinJsonRpc(bitcoinURL);
 
 	beforeAll(async () => {
-		testProfiles = await createAndPublishTestProfiles();
+		const res = await createAndPublishTestProfiles();
+		testProfiles = res.profiles;
+		sdk = res.sdk;
 
 		await completeOnboarding();
 
@@ -44,6 +47,10 @@ describe('Profile and Contacts', () => {
 
 	afterEach(() => {
 		waitForElectrum?.close();
+	});
+
+	afterAll(async () => {
+		await sdk.close();
 	});
 
 	describe('Slashtags', () => {

@@ -59,7 +59,5 @@ export const createAndPublishTestProfiles = async (): Promise<{}> => {
 		profile.url = url;
 	}
 
-	console.info('profiles', profiles);
-
-	return profiles;
+	return { profiles, sdk };
 };
