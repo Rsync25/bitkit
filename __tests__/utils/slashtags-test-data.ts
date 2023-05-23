@@ -37,7 +37,10 @@ export const createAndPush = async (contact): Promise<string> => {
 	return slashtag.url;
 };
 
-export const createAndPublishTestProfiles = async (): Promise<{}> => {
+export const createAndPublishTestProfiles = async (): Promise<{
+	profiles: {};
+	sdk: SDK;
+}> => {
 	const profiles = {
 		John: {
 			name: 'John Carvalho',

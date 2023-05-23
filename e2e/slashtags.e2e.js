@@ -50,7 +50,7 @@ describe('Profile and Contacts', () => {
 	});
 
 	afterAll(async () => {
-		await sdk.close();
+		await sdk?.close();
 	});
 
 	describe('Slashtags', () => {
