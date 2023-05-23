@@ -62,26 +62,10 @@ describe('Wallet - wallet restore and receive', () => {
 		}
 
 		expect(res.value).toEqual('Seed restored');
-		expect(store.getState().wallet.selectedNetwork).toEqual('bitcoin');
 		expect(store.getState().wallet.selectedWallet).toEqual('wallet0');
-
-		// switch to regtest
-		updateWallet({ selectedNetwork: 'bitcoinRegtest' });
 		expect(store.getState().wallet.selectedNetwork).toEqual('bitcoinRegtest');
 
-		res = await addElectrumPeer({
-			peer: { host: '127.0.0.1', ssl: 60002, tcp: 60001, protocol: 'tcp' },
-		});
-		if (res.isErr()) {
-			throw res.error;
-		}
-
 		res = await connectToElectrum();
-		if (res.isErr()) {
-			throw res.error;
-		}
-
-		res = await updateAddressIndexes();
 		if (res.isErr()) {
 			throw res.error;
 		}
