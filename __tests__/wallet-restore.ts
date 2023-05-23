@@ -4,12 +4,7 @@ import * as electrum from 'rn-electrum-client/helpers';
 import '../src/utils/i18n';
 import store from '../src/store';
 import { restoreSeed, startWalletServices } from '../src/utils/startup';
-import {
-	updateAddressIndexes,
-	updateWallet,
-} from '../src/store/actions/wallet';
 import { connectToElectrum } from '../src/utils/wallet/electrum';
-import { addElectrumPeer } from '../src/store/actions/settings';
 import initWaitForElectrumToSync from './utils/wait-for-electrum';
 
 jest.setTimeout(60_000);
