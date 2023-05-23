@@ -3,6 +3,7 @@ module.exports = {
 		$0: 'jest',
 		args: {
 			config: 'e2e/jest.config.js',
+			forceExit: true,
 			_: ['e2e'],
 		},
 	},
