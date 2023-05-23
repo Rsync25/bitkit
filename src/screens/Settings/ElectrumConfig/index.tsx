@@ -161,7 +161,7 @@ const ElectrumConfig = ({
 			}
 			await getAndUpdateConnectedPeer();
 		} catch (e) {
-			console.log(e);
+			console.log('electrum connect error', e);
 		} finally {
 			setLoading(false);
 		}

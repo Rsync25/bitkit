@@ -9,14 +9,18 @@ import {
 	bitcoinURL,
 } from './helpers';
 import initWaitForElectrumToSync from '../__tests__/utils/wait-for-electrum';
+import { createAndPublishTestProfiles } from '../__tests__/utils/slashtags-test-data';
 
 const __DEV__ = process.env.DEBUG === 'true';
 
 describe('Profile and Contacts', () => {
 	let waitForElectrum;
+	let testProfiles;
 	const rpc = new BitcoinJsonRpc(bitcoinURL);
 
 	beforeAll(async () => {
+		testProfiles = await createAndPublishTestProfiles();
+
 		await completeOnboarding();
 
 		let balance = await rpc.getBalance();
@@ -109,11 +113,8 @@ describe('Profile and Contacts', () => {
 
 			// John
 			await element(by.id('ContactURLInput')).replaceText(
-				'slash:9uate7b6srfaur8stm5br7kencdz6km9xde46iph165d6isidssy',
+				testProfiles.John.url,
 			);
-			// await waitFor(element(by.id('HourglassSpinner')))
-			// 	.not.toBeVisible()
-			// 	.withTimeout(30000);
 			await waitFor(element(by.id('NameInput')))
 				.toBeVisible()
 				.withTimeout(30000);
@@ -130,11 +131,8 @@ describe('Profile and Contacts', () => {
 				await element(by.id('AddContact')).tap();
 			}
 			await element(by.id('ContactURLInput')).replaceText(
-				'slash:rhbmdu3wn7916nok3n8ui4d3wiua3rtisihqpzpeakuci55fa8yy',
+				testProfiles.Corey.url,
 			);
-			// await waitFor(element(by.id('HourglassSpinner')))
-			// 	.not.toBeVisible()
-			// 	.withTimeout(30000);
 			await waitFor(element(by.id('NameInput')))
 				.toBeVisible()
 				.withTimeout(30000);
