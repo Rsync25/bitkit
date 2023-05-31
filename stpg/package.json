@@ -3,7 +3,7 @@
 	"type": "module",
 	"dependencies": {
 		"@ngneat/falso": "^6.0.3",
-		"@synonymdev/slashtags-sdk": "^1.0.0-alpha.17",
+		"@synonymdev/slashtags-sdk": "^1.0.0-alpha.40",
 		"@types/node-fetch": "^2.6.2",
 		"b4a": "^1.6.0",
 		"compact-encoding": "^2.11.0",

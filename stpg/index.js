@@ -82,16 +82,13 @@ async function resolveProfile() {
 	}
 	cache({ lastUsedURL: url });
 
-	const key = SlashURL.parse(url).key;
-	const drive = sdk.drive(key);
-	console.log('Resolving public drive ...');
-	console.time('-- resolved drive in');
-	await drive.update();
-	console.timeEnd('-- resolved drive in');
+	const slashtag = sdk.slashtag()
+	await slashtag.ready()
 
-	const profile = await drive.get('/profile.json').then(decodeJSON);
+	const profile = await slashtag.profile.readRemote(url)
+	const slashpay = await slashtag.coreData.readRemote(url + '/public/slashpay.json').then(decodeJSON)
 
-	const slashpay = await drive.get('/slashpay.json').then(decodeJSON);
+	const drive = slashtag.coreData._getRemoteDrive(SlashURL.parse(url), 'public')
 
 	console.dir(
 		{
@@ -106,6 +103,9 @@ async function resolveProfile() {
 
 /**
  * Creates a contact and returns its url
+ *
+ * Contacts created in this test will NOT be persisted on disk nor sent to seeder.
+ *
  * @param {boolean} log
  */
 async function createContact(log = true) {
@@ -114,27 +114,6 @@ async function createContact(log = true) {
 	const contact = await generateContact(slashtag.url);
 	await saveContact(slashtag, contact);
 	contacts[contact.url] = name;
-
-	// TODO fix seeder!!
-	const drive = slashtag.drivestore.get();
-	await drive.ready();
-
-	{
-		const key = b4a.toString(drive.key, 'hex');
-		await fetch('http://35.233.47.252:443/seeding/hypercore', {
-			method: 'POST',
-			body: JSON.stringify({ publicKey: key }),
-			headers: { 'Content-Type': 'application/json' },
-		});
-	}
-	{
-		const key = b4a.toString(drive.blobs.core.key, 'hex');
-		await fetch('http://35.233.47.252:443/seeding/hypercore', {
-			method: 'POST',
-			body: JSON.stringify({ publicKey: key }),
-			headers: { 'Content-Type': 'application/json' },
-		});
-	}
 
 	log && console.dir(formatContact(contact), { depth: null });
 	return contact.url;
@@ -171,7 +150,7 @@ async function updateContact() {
 	const nameUsedForCreatingSlashtag = contacts[selected];
 	const slashtag = sdk.slashtag(nameUsedForCreatingSlashtag);
 	const newContact = await generateContact(selected);
-	await saveContact(slashtag, newContact);
+	await saveContact(slashtag, newContact, true);
 	console.dir(formatContact(newContact), { depth: null });
 }
 
@@ -193,7 +172,7 @@ function loadCache() {
 	}
 }
 
-function noop() {}
+function noop() { }
 
 function formatProfile(profile) {
 	return (
@@ -211,12 +190,15 @@ function formatContact(contact) {
 	};
 }
 
-async function saveContact(slashtag, contact) {
-	const drive = slashtag.drivestore.get();
-	await drive.put('/profile.json', encodeJSON(contact.profile));
-	await drive.put('/slashpay.json', encodeJSON(contact.slashpay));
+async function saveContact(slashtag, contact, isUpdate = false) {
+	if (isUpdate) {
+		await slashtag.profile.update(contact.profile)
+		await slashtag.coreData.update('/public/slashpay.json', contact.slashpay)
+		return
+	}
 
-	return formatContact(contact);
+	await slashtag.profile.create(contact.profile)
+	await slashtag.coreData.create('/public/slashpay.json', contact.slashpay)
 }
 
 async function generateContact(url) {
@@ -263,7 +245,7 @@ export function decodeJSON(buf) {
 	}
 	try {
 		return JSON.parse(b4a.toString(buf));
-	} catch (error) {}
+	} catch (error) { }
 }
 
 /**
