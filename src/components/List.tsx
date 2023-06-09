@@ -321,6 +321,7 @@ const List = ({
 			)}
 			stickySectionHeadersEnabled={false}
 			contentContainerStyle={style}
+			keyboardShouldPersistTaps="handled"
 			bounces={bounces}
 			testID="List"
 		/>

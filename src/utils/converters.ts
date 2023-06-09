@@ -1,3 +1,6 @@
+import { chunkUint8Array } from './helpers';
+import { err, ok, Result } from '@synonymdev/result';
+
 /**
  * Convert readable string to bytes
  * @param str
@@ -9,13 +12,21 @@ export const stringToBytes = (str: string): Uint8Array => {
 
 /**
  * Converts bytes to readable string
- * @returns {string}
- * @param bytes
+ * @param {Uint8Array} bytes
+ * @returns {Result<string>}
  */
-export const bytesToString = (bytes: Uint8Array): string => {
-	const arr: number[] = [];
-	bytes.forEach((n) => arr.push(n));
-	return String.fromCharCode.apply(String, arr);
+export const bytesToString = (bytes: Uint8Array): Result<string> => {
+	let str = '';
+	const chunks = chunkUint8Array(bytes);
+	if (chunks.isErr()) {
+		return err(chunks.error.message);
+	}
+	for (let chunk of chunks.value) {
+		const arr: number[] = [];
+		chunk.forEach((n) => arr.push(n));
+		str += String.fromCharCode.apply(String, arr);
+	}
+	return ok(str);
 };
 
 /**

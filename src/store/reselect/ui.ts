@@ -2,7 +2,6 @@ import { createSelector } from '@reduxjs/toolkit';
 import Store from '../types';
 import {
 	IUi,
-	TProfileLink,
 	TViewController,
 	TUiViewController,
 	IViewControllerData,
@@ -65,7 +64,7 @@ export const showLaterButtonSelector = createSelector(
 
 export const profileLinkSelector = createSelector(
 	[uiState],
-	(ui): TProfileLink => ui.profileLink,
+	(ui) => ui.profileLink,
 );
 
 export const isOnlineSelector = createSelector(

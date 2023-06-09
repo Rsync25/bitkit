@@ -18,6 +18,7 @@ import type { WidgetsStackParamList } from '../widgets/WidgetsNavigator';
 import type { SettingsStackParamList } from '../settings/SettingsNavigator';
 import type { BackupStackParamList } from '../bottom-sheet/BackupNavigation';
 import type { PinStackParamList } from '../bottom-sheet/PINNavigation';
+import type { ProfileLinkStackParamList } from '../bottom-sheet/ProfileLinkNavigation';
 import type { ReceiveStackParamList } from '../bottom-sheet/ReceiveNavigation';
 import type { SendStackParamList } from '../bottom-sheet/SendNavigation';
 
@@ -38,8 +39,6 @@ export type RootStackParamList = {
 	Settings: NavigatorScreenParams<SettingsStackParamList>;
 	Profile: undefined;
 	ProfileEdit: undefined;
-	ProfileAddLink: undefined;
-	ProfileLinkSuggestions: undefined;
 	ProfileDetails: undefined;
 	Contacts: undefined;
 	ContactEdit: { url: string };
@@ -98,6 +97,9 @@ export type BackupScreenProps<T extends keyof BackupStackParamList> =
 
 export type PinScreenProps<T extends keyof PinStackParamList> =
 	NativeStackScreenProps<PinStackParamList, T>;
+
+export type ProfileLinkScreenProps<T extends keyof ProfileLinkStackParamList> =
+	NativeStackScreenProps<ProfileLinkStackParamList, T>;
 
 export type ReceiveScreenProps<T extends keyof ReceiveStackParamList> =
 	NativeStackScreenProps<ReceiveStackParamList, T>;

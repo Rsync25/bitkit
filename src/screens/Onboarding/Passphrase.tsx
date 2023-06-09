@@ -1,15 +1,14 @@
 import React, { ReactElement, memo, useState, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import {
 	Image,
 	Platform,
-	ScrollView,
 	StyleSheet,
 	View,
 	useWindowDimensions,
 } from 'react-native';
-import { Trans, useTranslation } from 'react-i18next';
 
-import { TextInput } from '../../styles/components';
+import { ScrollView, TextInput } from '../../styles/components';
 import { Display, Text01S } from '../../styles/text';
 import SafeAreaInset from '../../components/SafeAreaInset';
 import GlowingBackground from '../../components/GlowingBackground';
@@ -17,19 +16,19 @@ import NavigationHeader from '../../components/NavigationHeader';
 import KeyboardAvoidingView from '../../components/KeyboardAvoidingView';
 import Button from '../../components/Button';
 import Flag from '../../components/Flag';
-import type { OnboardingStackScreenProps } from '../../navigation/types';
 import { useScreenSize } from '../../hooks/screen';
+import type { OnboardingStackScreenProps } from '../../navigation/types';
 
 const imageSrc = require('../../assets/illustrations/padlock2.png');
 
 const Passphrase = ({
 	navigation,
 }: OnboardingStackScreenProps<'Passphrase'>): ReactElement => {
-	const [bip39Passphrase, setPassphrase] = useState<string>('');
-	const { isSmallScreen } = useScreenSize();
 	const { t } = useTranslation('onboarding');
-
 	const dimensions = useWindowDimensions();
+	const { isSmallScreen } = useScreenSize();
+	const [bip39Passphrase, setPassphrase] = useState<string>('');
+
 	const illustrationStyles = useMemo(
 		() => ({
 			...styles.image,
@@ -42,13 +41,11 @@ const Passphrase = ({
 
 	return (
 		<GlowingBackground topLeft="brand">
-			<KeyboardAvoidingView
-				style={styles.slide}
-				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+			<KeyboardAvoidingView style={styles.content}>
 				<ScrollView
-					bounces={false}
 					contentContainerStyle={styles.scrollContent}
-					showsVerticalScrollIndicator={false}>
+					showsVerticalScrollIndicator={false}
+					bounces={false}>
 					<SafeAreaInset type="top" />
 					<View style={styles.navigationContainer}>
 						<NavigationHeader />
@@ -105,7 +102,7 @@ const styles = StyleSheet.create({
 	scrollContent: {
 		flexGrow: 1,
 	},
-	slide: {
+	content: {
 		flex: 1,
 		justifyContent: 'space-between',
 		alignItems: 'stretch',

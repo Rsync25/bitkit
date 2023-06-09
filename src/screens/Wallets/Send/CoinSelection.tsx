@@ -1,12 +1,12 @@
 import React, { ReactElement, memo, useMemo, useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { useTranslation } from 'react-i18next';
 
-import GradientView from '../../../components/GradientView';
-import { Switch } from '../../../styles/components';
+import { ScrollView, Switch } from '../../../styles/components';
 import { Subtitle, Text01M, Text02M, Caption13Up } from '../../../styles/text';
+import GradientView from '../../../components/GradientView';
 import BottomSheetNavigationHeader from '../../../components/BottomSheetNavigationHeader';
 import SafeAreaInset from '../../../components/SafeAreaInset';
 import Button from '../../../components/Button';

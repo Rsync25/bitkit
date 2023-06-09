@@ -154,6 +154,7 @@ const ContactsList = ({
 	return (
 		<List
 			sections={sectionedContacts}
+			keyboardShouldPersistTaps="handled"
 			keyExtractor={(item: IContactRecord): string => item.url}
 			ListEmptyComponent={Empty}
 			renderSectionHeader={renderSectionHeader}

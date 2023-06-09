@@ -12,7 +12,8 @@ const SUPPORT_EMAIL = 'support@synonym.to';
 /**
  * Support link for opening device mail app.
  * Includes an optional message, device details, app version and LDK node info.
- * @param message
+ * @param {string} [subject]
+ * @param {string} [message]
  * @returns {Promise<`mailto:support@synonym.to?subject=Bitkit support&body=${string}`>}
  */
 export const createSupportLink = async (
@@ -38,6 +39,9 @@ export const createSupportLink = async (
 	if (nodeId.isOk()) {
 		body += `\nLDK node ID: ${nodeId.value}`;
 	}
+
+	subject = encodeURIComponent(subject);
+	body = encodeURIComponent(body);
 
 	return `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
 };

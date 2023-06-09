@@ -1,7 +1,7 @@
 import React, { ReactElement, memo } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { View as ThemedView } from '../../../styles/components';
+import { View as ThemedView, ScrollView } from '../../../styles/components';
 import { Caption13Up, Caption13M, Text01M } from '../../../styles/text';
 import SafeAreaInset from '../../../components/SafeAreaInset';
 import Button from '../../../components/Button';

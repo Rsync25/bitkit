@@ -110,7 +110,7 @@ export const startWalletServices = async ({
 		}
 		let isConnectedToElectrum = false;
 
-		await setupBlocktank(selectedNetwork);
+		await promiseTimeout(2500, setupBlocktank(selectedNetwork));
 		await promiseTimeout(2500, refreshBlocktankInfo());
 		updateExchangeRates().then();
 

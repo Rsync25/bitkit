@@ -25,7 +25,9 @@ export const unsettledStatuses = [0, 100, 200, 300, 350, 500];
  * @param {TAvailableNetworks} selectedNetwork
  * @returns {void}
  */
-export const setupBlocktank = (selectedNetwork: TAvailableNetworks): void => {
+export const setupBlocktank = async (
+	selectedNetwork: TAvailableNetworks,
+): Promise<void> => {
 	bt.setHeaders({ 'User-Agent': 'Bitkit' });
 	if (selectedNetwork === EAvailableNetworks.bitcoinTestnet) {
 		return;
@@ -33,7 +35,7 @@ export const setupBlocktank = (selectedNetwork: TAvailableNetworks): void => {
 		updateUser({ isGeoBlocked: false });
 		bt.setNetwork('regtest');
 	} else {
-		setGeoBlock().then();
+		await setGeoBlock();
 		bt.setNetwork('mainnet');
 	}
 };

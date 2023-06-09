@@ -2,58 +2,65 @@ import React, { memo, ReactElement } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import NavigationHeader from '../../components/NavigationHeader';
-import { View as ThemedView } from '../../styles/components';
 import Button from '../../components/Button';
+import BottomSheetNavigationHeader from '../../components/BottomSheetNavigationHeader';
+import GradientView from '../../components/GradientView';
 import { updateProfileLink } from '../../store/actions/ui';
-import SafeAreaInset from '../../components/SafeAreaInset';
-import type { RootStackScreenProps } from '../../navigation/types';
+import { TProfileLink } from '../../store/types/ui';
+import type { ProfileLinkScreenProps } from '../../navigation/types';
 
-const suggestions = [
-	'Email',
-	'Phone',
-	'Website',
-	'Twitter',
-	'Telegram',
-	'Instagram',
-	'Facebook',
-	'LinkedIn',
-	'Github',
-	'Calendly',
-	'Vimeo',
-	'YouTube',
-	'Twitch',
-	'Pinterest',
-	'TikTok',
-	'Spotify',
+type TSuggestion = {
+	prefix: string;
+	title: TProfileLink['title'];
+};
+
+export const suggestions: TSuggestion[] = [
+	{ prefix: 'mailto:', title: 'Email' },
+	{ prefix: 'tel:', title: 'Phone' },
+	{ prefix: 'https://', title: 'Website' },
+	{ prefix: 'https://twitter.com/', title: 'Twitter' },
+	{ prefix: 'https://t.me/', title: 'Telegram' },
+	{ prefix: 'https://discord.gg/', title: 'Discord' },
+	{ prefix: 'https://instagram.com/', title: 'Instagram' },
+	{ prefix: 'https://facebook.com/', title: 'Facebook' },
+	{ prefix: 'https://linkedin.com/in/', title: 'LinkedIn' },
+	{ prefix: 'https://github.com/', title: 'GitHub' },
+	{ prefix: 'https://calendly.com/', title: 'Calendly' },
+	{ prefix: 'https://vimeo.com/', title: 'Vimeo' },
+	{ prefix: 'https://youtube.com/@', title: 'YouTube' },
+	{ prefix: 'https://twitch.tv/', title: 'Twitch' },
+	{ prefix: 'https://pinterest.com/', title: 'Pinterest' },
+	{ prefix: 'https://tiktok.com/@', title: 'TikTok' },
+	{ prefix: 'https://open.spotify.com/user/', title: 'Spotify' },
 ];
 
 const ProfileLinkSuggestions = ({
 	navigation,
-}: RootStackScreenProps<'ProfileLinkSuggestions'>): ReactElement => {
+}: ProfileLinkScreenProps<'ProfileLinkSuggestions'>): ReactElement => {
 	const { t } = useTranslation('slashtags');
 
-	const handleChoose = (suggestion: string): void => {
-		updateProfileLink({ title: suggestion });
+	const handleChoose = (suggestion: TSuggestion): void => {
+		updateProfileLink({ title: suggestion.title, url: suggestion.prefix });
 		navigation.goBack();
 	};
 
 	return (
-		<ThemedView style={styles.container}>
-			<SafeAreaInset type="top" />
-			<NavigationHeader title={t('profile_link_suggestions_to_add')} />
+		<GradientView style={styles.container}>
+			<BottomSheetNavigationHeader
+				title={t('profile_link_suggestions_to_add')}
+			/>
 			<View style={styles.buttons}>
 				{suggestions.map((suggestion) => (
 					<Button
-						key={suggestion}
-						text={suggestion}
+						key={suggestion.title}
 						style={styles.button}
+						text={suggestion.title}
 						color="white16"
 						onPress={(): void => handleChoose(suggestion)}
 					/>
 				))}
 			</View>
-		</ThemedView>
+		</GradientView>
 	);
 };
 

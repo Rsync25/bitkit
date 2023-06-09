@@ -15,6 +15,23 @@ import { openURL } from '../utils/helpers';
 import { editLink, removeLink } from '../store/actions/slashtags';
 import LabeledInput from './LabeledInput';
 import Divider from './Divider';
+import { suggestions } from '../screens/Profile/ProfileLinkSuggestions';
+
+const trimLink = (link: LocalLink): string => {
+	let trimmedUrl = link.url;
+	const suggestion = suggestions.find((s) => s.title === link.title);
+	const AtPrefixed = ['TikTok', 'Twitter', 'YouTube'];
+
+	if (suggestion) {
+		if (AtPrefixed.includes(link.title)) {
+			trimmedUrl = trimmedUrl.replace(suggestion.prefix, '@');
+		} else {
+			trimmedUrl = trimmedUrl.replace(suggestion.prefix, '');
+		}
+	}
+
+	return trimmedUrl.replace('https://', '').replace('www.', '');
+};
 
 const ProfileLinks = ({
 	links,
@@ -36,10 +53,7 @@ const ProfileLinks = ({
 				</>
 			) : (
 				links.map((link): JSX.Element => {
-					const trimmedUrl = link.url
-						.replace('https://', '')
-						.replace('www.', '')
-						.replace('twitter.com/', '@');
+					const trimmedUrl = trimLink(link);
 
 					return editable ? (
 						<LabeledInput

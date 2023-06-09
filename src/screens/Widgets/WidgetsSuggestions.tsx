@@ -1,8 +1,8 @@
 import React, { ReactElement } from 'react';
-import { TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { View } from '../../styles/components';
+import { View, ScrollView } from '../../styles/components';
 import { Title } from '../../styles/text';
 import {
 	ChartLineIcon,

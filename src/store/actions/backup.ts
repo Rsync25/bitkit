@@ -212,9 +212,11 @@ export const performLdkRestore = async ({
 		return err(storageRes.error);
 	}
 
-	const backup: TAccountBackup<TLdkData> = JSON.parse(
-		bytesToString(fetchRes.value.content),
-	);
+	const bytesToStringRes = bytesToString(fetchRes.value.content);
+	if (bytesToStringRes.isErr()) {
+		return err(bytesToStringRes.error);
+	}
+	const backup: TAccountBackup<TLdkData> = JSON.parse(bytesToStringRes.value);
 
 	//TODO add "sweepChannelsOnStartup: true" when lib has been updated
 	const importRes = await lm.importAccount({
@@ -268,7 +270,11 @@ export const getBackup = async <T>({
 		return err(fetchRes.error);
 	}
 
-	const backup: T = JSON.parse(bytesToString(fetchRes.value.content));
+	const bytesToStringRes = bytesToString(fetchRes.value.content);
+	if (bytesToStringRes.isErr()) {
+		return err(bytesToStringRes.error);
+	}
+	const backup: T = JSON.parse(bytesToStringRes.value);
 
 	// Restore success
 	return ok(backup);

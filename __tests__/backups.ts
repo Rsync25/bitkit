@@ -100,8 +100,11 @@ describe('Remote backups', () => {
 		if (fetchRes.isErr()) {
 			throw fetchRes.error;
 		}
-
-		expect(bytesToString(fetchRes.value.content)).toEqual(message);
+		const bytesToStringRes = bytesToString(fetchRes.value.content);
+		if (bytesToStringRes.isErr()) {
+			throw bytesToStringRes.error;
+		}
+		expect(bytesToStringRes.value).toEqual(message);
 	});
 
 	it('Backups and restores metadata', async () => {

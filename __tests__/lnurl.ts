@@ -3,8 +3,9 @@ import {
 	deriveLinkingKeys,
 	getLNURLParams,
 	signK1,
-	LNURLAuthParams,
 } from '@synonymdev/react-native-lnurl';
+import { LNURLAuthParams } from 'js-lnurl';
+
 import { EAvailableNetworks } from '@synonymdev/react-native-lnurl/dist/utils/types';
 
 const mnemonic =
@@ -19,7 +20,7 @@ describe('LN URL', () => {
 
 		expect(lnurlRes.isOk()).toEqual(true);
 		if (lnurlRes.isErr()) {
-			return;
+			throw lnurlRes.error;
 		}
 
 		const params = lnurlRes.value as LNURLAuthParams;
@@ -32,7 +33,7 @@ describe('LN URL', () => {
 
 		expect(keysRes.isOk()).toEqual(true);
 		if (keysRes.isErr()) {
-			return;
+			throw keysRes.error;
 		}
 
 		if (keysRes.isOk()) {
@@ -52,7 +53,7 @@ describe('LN URL', () => {
 			);
 		}
 		if (signRes.isErr()) {
-			return;
+			throw signRes.error;
 		}
 
 		const callbackUrlRes = await createAuthCallbackUrl({
@@ -64,7 +65,7 @@ describe('LN URL', () => {
 		expect(callbackUrlRes.isOk()).toEqual(true);
 		if (callbackUrlRes.isOk()) {
 			expect(callbackUrlRes.value).toEqual(
-				'https://api.testnet.lnmarkets.com/lnurl/a?tag=login&k1=999f80994825233cdca95571221c57b911b6a5e4344b591802ec3a33cda0a784&hmac=e01c193fc276d0c07ab0a1744293b1c3c91c569108e0cba24d384a066945e055&sig=3045022100fb9ab319ebabc2bbaec403544cc47ea6287613fc374be3612c2dde6b34c1e31b022013ec1b14efe24d64bdab77858b19efa5112e6ea6108de96f2c901dd13fc6afaa&key=0388b8c9d0480679cec949a15a8a53f68a16d10827de5da669a8685faf68e5ebe5',
+				'https://api.testnet.lnmarkets.com/lnurl/a?hmac=e01c193fc276d0c07ab0a1744293b1c3c91c569108e0cba24d384a066945e055&k1=999f80994825233cdca95571221c57b911b6a5e4344b591802ec3a33cda0a784&key=0388b8c9d0480679cec949a15a8a53f68a16d10827de5da669a8685faf68e5ebe5&sig=3045022100fb9ab319ebabc2bbaec403544cc47ea6287613fc374be3612c2dde6b34c1e31b022013ec1b14efe24d64bdab77858b19efa5112e6ea6108de96f2c901dd13fc6afaa&tag=login',
 			);
 		}
 	});

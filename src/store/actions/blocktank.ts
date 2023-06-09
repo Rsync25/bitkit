@@ -27,6 +27,7 @@ import {
 	finalizeChannel,
 	getBlocktankInfo,
 	getOrder,
+	isGeoBlocked,
 	watchOrder,
 } from '../../utils/blocktank';
 import {
@@ -140,6 +141,10 @@ export const refreshOrder = async (
  * @returns {Promise<void>}
  */
 export const refreshBlocktankInfo = async (): Promise<Result<string>> => {
+	const geoBlocked = await isGeoBlocked(true);
+	if (geoBlocked) {
+		return ok('No need to update Blocktank info.');
+	}
 	const infoResponse = await getBlocktankInfo();
 	if (infoResponse.node_info) {
 		dispatch({

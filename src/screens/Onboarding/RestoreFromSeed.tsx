@@ -8,7 +8,6 @@ import React, {
 import {
 	Keyboard,
 	NativeSyntheticEvent,
-	ScrollView,
 	StyleSheet,
 	TextInput,
 	TextInputKeyPressEventData,
@@ -19,6 +18,7 @@ import rnAndroidKeyboardAdjust from 'rn-android-keyboard-adjust';
 import { KeyboardAccessoryView } from 'react-native-keyboard-accessory';
 import { Trans, useTranslation } from 'react-i18next';
 
+import { ScrollView } from '../../styles/components';
 import { Display, Text01S, Text02S } from '../../styles/text';
 import GlowingBackground from '../../components/GlowingBackground';
 import SafeAreaInset from '../../components/SafeAreaInset';

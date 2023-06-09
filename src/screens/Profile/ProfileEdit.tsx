@@ -20,30 +20,33 @@ import SafeAreaInset from '../../components/SafeAreaInset';
 import ProfileCard from '../../components/ProfileCard';
 import ProfileLinks from '../../components/ProfileLinks';
 import Divider from '../../components/Divider';
+import { Keyboard } from '../../hooks/keyboard';
 import { useProfile, useSelectedSlashtag } from '../../hooks/slashtags';
 import {
 	setLinks,
 	setOnboardingProfileStep,
 } from '../../store/actions/slashtags';
 import { removeTodo } from '../../store/actions/todos';
+import { showBottomSheet } from '../../store/actions/ui';
 import { BasicProfile } from '../../store/types/slashtags';
 import { slashtagsLinksSelector } from '../../store/reselect/slashtags';
 import { onboardingProfileStepSelector } from '../../store/reselect/slashtags';
 import { arraysMatch } from '../../utils/helpers';
 import { saveProfile } from '../../utils/slashtags';
+import ProfileLinkNavigation from '../../navigation/bottom-sheet/ProfileLinkNavigation';
 import type { RootStackScreenProps } from '../../navigation/types';
 
 const ProfileEdit = ({
 	navigation,
 }: RootStackScreenProps<'Profile' | 'ProfileEdit'>): ReactElement => {
 	const { t } = useTranslation('slashtags');
+	const { url, slashtag } = useSelectedSlashtag();
+	const { profile: savedProfile } = useProfile(url);
 	const [hasEdited, setHasEdited] = useState(false);
+	const [isSaving, setIsSaving] = useState(false);
 	const [fields, setFields] = useState<Omit<BasicProfile, 'links'>>({});
 	const links = useSelector(slashtagsLinksSelector);
 	const onboardingStep = useSelector(onboardingProfileStepSelector);
-
-	const { url, slashtag } = useSelectedSlashtag();
-	const { profile: savedProfile } = useProfile(url);
 
 	const onboardedProfile = onboardingStep === 'Done';
 
@@ -84,8 +87,17 @@ const ProfileEdit = ({
 		};
 	}, [savedProfile, fields, links]);
 
-	const save = async (): Promise<void> => {
+	const onAddLink = async (): Promise<void> => {
+		await Keyboard.dismiss();
+		showBottomSheet('profileAddDataForm');
+	};
+
+	const onSave = async (): Promise<void> => {
+		setIsSaving(true);
 		await saveProfile(slashtag, profile);
+		setIsSaving(false);
+		await Keyboard.dismiss();
+
 		if (!onboardedProfile) {
 			setOnboardingProfileStep('OfflinePayments');
 			removeTodo('slashtagsProfile');
@@ -134,13 +146,11 @@ const ProfileEdit = ({
 					<Button
 						style={styles.addLinkButton}
 						text={t('profile_add_link')}
-						onPress={(): void => {
-							navigation.navigate('ProfileAddLink');
-						}}
 						icon={
 							<PlusIcon color="brand" width={16} style={styles.addLinkButton} />
 						}
 						testID="ProfileAddLink"
+						onPress={onAddLink}
 					/>
 					<Divider />
 					<Text02S color="gray1">{t('profile_public_warn')}</Text02S>
@@ -151,14 +161,17 @@ const ProfileEdit = ({
 							style={styles.button}
 							text={t(onboardedProfile ? 'profile_save' : 'continue')}
 							size="large"
+							loading={isSaving}
 							disabled={!hasEdited || !isValid()}
-							onPress={save}
+							onPress={onSave}
 							testID="ProfileSaveButton"
 						/>
 					</View>
 				</ScrollView>
 				<SafeAreaInset type="bottom" minPadding={16} />
 			</KeyboardAvoidingView>
+
+			<ProfileLinkNavigation />
 		</ThemedView>
 	);
 };

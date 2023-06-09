@@ -7,11 +7,10 @@ import {
 	View,
 	GestureResponderEvent,
 	Keyboard,
-	ScrollView,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { View as ThemedView } from '../../styles/components';
+import { View as ThemedView, ScrollView } from '../../styles/components';
 import { Caption13M } from '../../styles/text';
 import { CalendarIcon, TagIcon } from '../../styles/icons';
 import NavigationHeader from '../../components/NavigationHeader';

@@ -1,8 +1,8 @@
 import React, { memo, ReactElement, useMemo } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { View as ThemedView } from '../../styles/components';
+import { View as ThemedView, ScrollView } from '../../styles/components';
 import { UsersIcon } from '../../styles/icons';
 import { useProfile, useSelectedSlashtag } from '../../hooks/slashtags';
 import NavigationHeader from '../../components/NavigationHeader';
@@ -10,8 +10,8 @@ import SafeAreaInset from '../../components/SafeAreaInset';
 import ProfileCard from '../../components/ProfileCard';
 import ProfileLinks from '../../components/ProfileLinks';
 import Divider from '../../components/Divider';
-import type { RootStackScreenProps } from '../../navigation/types';
 import Button from '../../components/Button';
+import type { RootStackScreenProps } from '../../navigation/types';
 
 const ProfileDetails = ({
 	navigation,

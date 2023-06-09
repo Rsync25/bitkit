@@ -425,18 +425,20 @@ export const timeAgo = (timestamp: number): string => {
 	});
 };
 
-export const openURL = async (url: string): Promise<void> => {
+export const openURL = async (url: string): Promise<boolean> => {
 	const supported = await Linking.canOpenURL(url);
-
 	try {
 		if (supported) {
 			await Linking.openURL(url);
+			return true;
 		} else {
 			console.log('Cannot open url: ', url);
+			return false;
 		}
 	} catch (e) {
 		console.log('Cannot open url: ', url);
 		console.error('Error open url: ', e);
+		return false;
 	}
 };
 
@@ -612,3 +614,28 @@ export const removeKeyFromObject = (
 	key: string,
 	{ [key]: _, ...rest }: Record<string, any>,
 ): Record<string, any> => rest;
+
+/**
+ * Breaks a Uint8Array into smaller chunks of a given size
+ * @param {Uint8Array} buffer
+ * @param {number} chunkSize
+ * @returns {Uint8Array[]}
+ */
+export const chunkUint8Array = (
+	buffer: Uint8Array,
+	chunkSize = 50000,
+): Result<Uint8Array[]> => {
+	if (!Number.isInteger(chunkSize) || chunkSize <= 0) {
+		return err('chunkSize must be a positive integer.');
+	}
+	let result: Uint8Array[] = [];
+	try {
+		for (let i = 0; i < buffer.length; i += chunkSize) {
+			let chunk = new Uint8Array(buffer.buffer.slice(i, i + chunkSize));
+			result.push(chunk);
+		}
+	} catch (e) {
+		return err(e);
+	}
+	return ok(result);
+};

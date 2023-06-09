@@ -7,14 +7,15 @@ import { address as bitcoinJSAddress } from 'bitcoinjs-lib';
 import { err, ok, Result } from '@synonymdev/result';
 import SDK from '@synonymdev/slashtags-sdk';
 import { TInvoice } from '@synonymdev/react-native-ldk';
+import { getLNURLParams } from '@synonymdev/react-native-lnurl';
+
 import {
-	getLNURLParams,
 	LNURLAuthParams,
 	LNURLChannelParams,
 	LNURLPayParams,
 	LNURLResponse,
 	LNURLWithdrawParams,
-} from '@synonymdev/react-native-lnurl';
+} from 'js-lnurl';
 
 import {
 	getOnchainTransactionData,

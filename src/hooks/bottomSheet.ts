@@ -38,7 +38,7 @@ export const useSnapPoints = (
 		}
 
 		// small / default
-		return [400 + insets.bottom];
+		return [400 + Math.max(insets.bottom, 16)];
 	}, [size, height, insets]);
 
 	return snapPoints;

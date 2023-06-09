@@ -45,8 +45,8 @@ const ui = (state: IUi = defaultUiShape, action): IUi => {
 			return {
 				...state,
 				profileLink: {
-					title: action.payload.title,
-					url: action.payload.url ?? state.profileLink.url,
+					...state.profileLink,
+					...action.payload,
 				},
 			};
 		}

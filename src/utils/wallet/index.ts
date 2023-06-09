@@ -1593,11 +1593,15 @@ export const formatTransactions = async ({
 		const fee = Number(Math.abs(totalValue).toFixed(8));
 		const satsPerByte = btcToSats(fee) / result.vsize;
 		const { address, height, scriptHash } = data;
-		const timestamp = Date.now();
+		let timestamp = Date.now();
 		let confirmTimestamp: number | undefined;
 
 		if (height > 0 && result.blocktime) {
 			confirmTimestamp = result.blocktime * 1000;
+			//In the event we're recovering, set the older timestamp.
+			if (confirmTimestamp < timestamp) {
+				timestamp = confirmTimestamp;
+			}
 		}
 
 		formattedTransactions[txid] = {

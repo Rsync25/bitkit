@@ -12,8 +12,7 @@ describe('Wallet Methods', () => {
 	it('Derive multiple mnemonic phrases for lightning and tokens via the on-chain phrase.', async () => {
 		const res = await deriveMnemonicPhrases(mnemonic);
 		if (res.isErr()) {
-			expect(res.error.message).toEqual('');
-			return;
+			throw res.error;
 		}
 		expect(res.value.onchain).toEqual(mnemonic);
 		expect(res.value.lightning).toEqual(

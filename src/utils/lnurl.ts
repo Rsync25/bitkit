@@ -3,11 +3,13 @@ import {
 	createPayRequestUrl,
 	createWithdrawCallbackUrl,
 	lnurlAuth as lnAuth,
+} from '@synonymdev/react-native-lnurl';
+import {
 	LNURLAuthParams,
 	LNURLChannelParams,
 	LNURLPayParams,
 	LNURLWithdrawParams,
-} from '@synonymdev/react-native-lnurl';
+} from 'js-lnurl';
 import { err, ok, Result } from '@synonymdev/result';
 
 import {
@@ -273,7 +275,7 @@ export const handleLnurlWithdraw = async ({
 		selectedNetwork = getSelectedNetwork();
 	}
 
-	const amountSats = params.maxWithdrawable / 1000; //Convert msats to sats.
+	const amountSats = Math.floor(params.maxWithdrawable / 1000); //Convert msats to sats.
 	const description = params.defaultDescription;
 
 	// Determine if we have enough receiving capacity before proceeding.
@@ -326,6 +328,15 @@ export const handleLnurlWithdraw = async ({
 			message: i18n.t('other:lnurl_withdr_error_connect'),
 		});
 		return err('Unable to connect to LNURL withdraw server.');
+	}
+
+	const jsonRes = await channelStatusRes.json();
+	if (jsonRes.status === 'ERROR') {
+		showErrorNotification({
+			title: i18n.t('other:lnurl_withdr_error'),
+			message: jsonRes.reason,
+		});
+		return err(jsonRes.reason);
 	}
 
 	showSuccessNotification({

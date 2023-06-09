@@ -106,7 +106,11 @@ const About = ({
 						type: EItemType.button,
 						onPress: async (): Promise<void> => {
 							const link = await createSupportLink();
-							await openURL(link);
+							const openUrlSuccess = await openURL(link);
+							if (!openUrlSuccess) {
+								//If unable to open mail app for any reason, open contact page in browser.
+								await openURL('https://synonym.to/contact');
+							}
 						},
 					},
 					{

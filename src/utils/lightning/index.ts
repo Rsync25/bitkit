@@ -81,6 +81,16 @@ export const DEFAULT_LIGHTNING_PEERS: IWalletItem<string[]> = {
 	bitcoinTestnet: [],
 };
 
+export const FALLBACK_BLOCKTANK_PEERS: IWalletItem<string[]> = {
+	bitcoin: [
+		'0296b2db342fcf87ea94d981757fdf4d3e545bd5cef4919f58b5d38dfdd73bf5c9@34.79.58.84:9735',
+	],
+	bitcoinRegtest: [
+		'03b9a456fb45d5ac98c02040d39aec77fa3eeb41fd22cf40b862b393bcfc43473a@35.233.47.252:9400',
+	],
+	bitcoinTestnet: [],
+};
+
 let paymentSubscription: EmitterSubscription | undefined;
 let onChannelSubscription: EmitterSubscription | undefined;
 let onSpendableOutputsSubscription: EmitterSubscription | undefined;
@@ -844,10 +854,6 @@ export const addPeers = async ({
 	selectedNetwork?: TAvailableNetworks;
 } = {}): Promise<Result<string[]>> => {
 	try {
-		const nodeUris = getBlocktankStore()?.info?.node_info?.uris;
-		if (!nodeUris) {
-			return err('No peers available to add.');
-		}
 		if (!selectedWallet) {
 			selectedWallet = getSelectedWallet();
 		}
@@ -855,7 +861,18 @@ export const addPeers = async ({
 			selectedNetwork = getSelectedNetwork();
 		}
 		const geoBlocked = await isGeoBlocked(true);
-		const blocktankLightningPeers = geoBlocked ? [] : nodeUris; //No need to add Blocktank node if they're geo-blocked.
+
+		let blocktankNodeUris: string[] = [];
+		// No need to add Blocktank peer if geo-blocked.
+		if (!geoBlocked) {
+			// Set Blocktank node uri array if able.
+			blocktankNodeUris = getBlocktankStore()?.info?.node_info?.uris ?? [];
+			if (!blocktankNodeUris.length) {
+				// Fall back to hardcoded Blocktank peer if the blocktankNodeUris array is empty.
+				blocktankNodeUris = FALLBACK_BLOCKTANK_PEERS[selectedNetwork];
+			}
+		}
+		const blocktankLightningPeers = blocktankNodeUris;
 		const defaultLightningPeers = DEFAULT_LIGHTNING_PEERS[selectedNetwork];
 		const customLightningPeers = getCustomLightningPeers({
 			selectedNetwork,

@@ -2,7 +2,12 @@ import { Platform } from 'react-native';
 import { getBuildNumber } from 'react-native-device-info';
 import { ok, Result } from '@synonymdev/result';
 
-import { IUi, TAvailableUpdate, ViewControllerParamList } from '../types/ui';
+import {
+	IUi,
+	TAvailableUpdate,
+	TProfileLink,
+	ViewControllerParamList,
+} from '../types/ui';
 import { getDispatch } from '../helpers';
 import actions from './actions';
 
@@ -42,8 +47,8 @@ export const closeBottomSheet = (id: keyof ViewControllerParamList): void => {
 };
 
 export const updateProfileLink = (payload: {
-	title: string;
-	url?: string;
+	title: TProfileLink['title'];
+	url: TProfileLink['url'];
 }): Result<string> => {
 	dispatch({
 		type: actions.UPDATE_PROFILE_LINK,
