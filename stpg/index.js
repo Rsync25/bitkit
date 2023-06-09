@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import falso from '@ngneat/falso';
 import fetch from 'node-fetch';
-import SDK, { SlashURL } from '@synonymdev/slashtags-sdk';
+import SDK from '@synonymdev/slashtags-sdk';
 import RAM from 'random-access-memory';
 import b4a from 'b4a';
 
@@ -82,18 +82,16 @@ async function resolveProfile() {
 	}
 	cache({ lastUsedURL: url });
 
-	const slashtag = sdk.slashtag()
-	await slashtag.ready()
+	const slashtag = sdk.slashtag();
 
-	const profile = await slashtag.profile.readRemote(url)
-	const slashpay = await slashtag.coreData.readRemote(url + '/public/slashpay.json').then(decodeJSON)
-
-	const drive = slashtag.coreData._getRemoteDrive(SlashURL.parse(url), 'public')
+	const profile = await slashtag.profile.readRemote(url);
+	const slashpay = await slashtag.coreData
+		.readRemote(url + '/public/slashpay.json')
+		.then(decodeJSON);
 
 	console.dir(
 		{
 			url: url,
-			version: drive.files.version,
 			profile: formatProfile(profile),
 			slashpay,
 		},
@@ -192,13 +190,19 @@ function formatContact(contact) {
 
 async function saveContact(slashtag, contact, isUpdate = false) {
 	if (isUpdate) {
-		await slashtag.profile.update(contact.profile)
-		await slashtag.coreData.update('/public/slashpay.json', contact.slashpay)
-		return
+		await slashtag.profile.update(contact.profile);
+		await slashtag.coreData.update(
+			'/public/slashpay.json',
+			encodeJSON(contact.slashpay),
+		);
+		return;
 	}
 
-	await slashtag.profile.create(contact.profile)
-	await slashtag.coreData.create('/public/slashpay.json', contact.slashpay)
+	await slashtag.profile.create(contact.profile);
+	await slashtag.coreData.create(
+		'/public/slashpay.json',
+		encodeJSON(contact.slashpay),
+	);
 }
 
 async function generateContact(url) {
