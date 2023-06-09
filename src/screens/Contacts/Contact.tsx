@@ -51,7 +51,7 @@ const Contact = ({
 	const selectedNetwork = useSelector(selectedNetworkSelector);
 
 	const { profile } = useProfile(url, { resolve: true });
-	const { slashtag } = useSelectedSlashtag();
+	const slashtag = useSelectedSlashtag();
 	const sdk = useSlashtagsSDK();
 	const contactRecord = useSlashtags().contacts[url];
 	const { spendableBalance } = useBalance();

@@ -31,7 +31,7 @@ const FAILED_BACKUP_NOTIFICATION_INTERVAL = 10 * 60 * 1000; // 10 minutes
 const EnabledSlashtag = (): ReactElement => {
 	const { t } = useTranslation('settings');
 	const selectedNetwork = useSelector(selectedNetworkSelector);
-	const { slashtag } = useSelectedSlashtag();
+	const slashtag = useSelectedSlashtag();
 	const backup = useSelector(backupSelector);
 	const settings = useSelector(settingsSelector);
 	const metadata = useSelector(metadataState);

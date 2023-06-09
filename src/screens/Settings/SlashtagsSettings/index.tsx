@@ -10,7 +10,7 @@ import { useSlashtagsSDK } from '../../../components/SlashtagsProvider';
 import { lastSentSelector } from '../../../store/reselect/slashtags';
 
 const SlashtagsSettings = (): ReactElement => {
-	const { slashtag } = useSelectedSlashtag();
+	const slashtag = useSelectedSlashtag();
 	const sdk = useSlashtagsSDK();
 
 	const [discoveryKey, setDiscoveryKey] = useState(

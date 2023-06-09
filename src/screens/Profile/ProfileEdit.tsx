@@ -40,8 +40,8 @@ const ProfileEdit = ({
 	navigation,
 }: RootStackScreenProps<'Profile' | 'ProfileEdit'>): ReactElement => {
 	const { t } = useTranslation('slashtags');
-	const { url, slashtag } = useSelectedSlashtag();
-	const { profile: savedProfile } = useProfile(url);
+	const slashtag = useSelectedSlashtag();
+	const { profile: savedProfile } = useProfile(slashtag.url);
 	const [hasEdited, setHasEdited] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [fields, setFields] = useState<Omit<BasicProfile, 'links'>>({});
@@ -135,7 +135,7 @@ const ProfileEdit = ({
 					contentContainerStyle={styles.scrollContent}
 					showsVerticalScrollIndicator={false}>
 					<ProfileCard
-						url={url}
+						url={slashtag.url}
 						editable={true}
 						resolving={false}
 						profile={profile}

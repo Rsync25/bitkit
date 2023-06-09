@@ -3,7 +3,6 @@ import b4a from 'b4a';
 import mime from 'mime/lite';
 import debounce from 'lodash.debounce';
 
-import { __SLASHTAGS_SEEDER_BASE_URL__ } from '../../constants/env';
 import { rootNavigation } from '../../navigation/root/RootNavigator';
 import { BasicProfile, SlashPayConfig } from '../../store/types/slashtags';
 import { showErrorNotification } from '../notifications';
@@ -57,7 +56,6 @@ export const getSelectedSlashtag = (sdk: SDK): Slashtag => {
 /**
  * Saves a contact record in the contacts drive, and cache it in the store.
  */
-// TODO(slashtags): should we add this to salshtag.setContact() ?
 export const saveContact = async (
 	slashtag: Slashtag,
 	url: string,
@@ -86,17 +84,19 @@ export const saveProfile = async (
 		return;
 	}
 
-	const drive = await slashtag?.drivestore.get();
-	await drive.put('/profile.json', encodeJSON(profile)).catch((error: Error) =>
-		showErrorNotification({
-			title: i18n.t('slashtags:error_saving_profile'),
-			message: error.message,
-		}),
-	);
+	try {
+		await slashtag.profile.update(profile);
+	} catch (error) {
+		console.log({ 'ERORR IN SAVE PROFILE': error });
+		await slashtag.profile.create(profile).catch(() => {
+			showErrorNotification({
+				title: i18n.t('slashtags:error_saving_profile'),
+				message: error.message,
+			});
+		});
+	}
 
-	cacheProfile(slashtag.url, drive.files.feed.fork, drive.version, profile);
-
-	drive.close();
+	cacheProfile(slashtag.url, profile);
 };
 
 /**
@@ -310,56 +310,6 @@ export const updateSlashPayConfig = debounce(
 	5000,
 );
 
-/** Send hypercorse to seeder */
-export const seedDrives = async (slashtag: Slashtag): Promise<boolean> => {
-	// TODO (slashtags) https://github.com/synonymdev/slashtags/issues/56
-	let drives: Hyperdrive[] = [];
-	drives.push(slashtag.drivestore.get());
-	drives.push(slashtag.drivestore.get('contacts'));
-
-	// TODO (slashtags) move this logic (getting keys to be seeded) to the SDK
-	return Promise.all(
-		drives.map(async (drive: Hyperdrive) => {
-			await drive.ready();
-			await drive.getBlobs();
-			const keys = [
-				b4a.toString(drive.key, 'hex'),
-				b4a.toString(drive.blobs.core.key, 'hex'),
-			];
-
-			const firstResponse = await fetch(
-				__SLASHTAGS_SEEDER_BASE_URL__ + '/seeding/hypercore',
-				{
-					method: 'POST',
-					body: JSON.stringify({ publicKey: keys[0] }),
-					headers: { 'Content-Type': 'application/json' },
-				},
-			);
-
-			const secondResponse = await fetch(
-				__SLASHTAGS_SEEDER_BASE_URL__ + '/seeding/hypercore',
-				{
-					method: 'POST',
-					body: JSON.stringify({ publicKey: keys[1] }),
-					headers: { 'Content-Type': 'application/json' },
-				},
-			);
-
-			drive.close();
-			return [firstResponse.status, secondResponse.status].every(
-				(s) => s === 200,
-			);
-		}),
-	)
-		.then((results) => results.every(Boolean))
-		.catch((error) => {
-			console.debug('Error in seeding drives request', {
-				error: error.message,
-			});
-			return false;
-		});
-};
-
 /** Get the slashpay.json of remote contact */
 export const getSlashPayConfig = async (
 	sdk: SDK,
@@ -447,6 +397,7 @@ export const readAsDataURL = async (
 /**
  * Checks if current versions for Profiles and Contacts hyperdrives are seeded by our server.
  */
+// TODO(slashtags): substitute this with something in core-data (if needed)
 export const checkBackup = async (
 	slashtag: Slashtag,
 ): Promise<{
@@ -458,50 +409,51 @@ export const checkBackup = async (
 		slashtag.drivestore.get('contacts'),
 	];
 
-	const [profile, contacts] = await Promise.all(
-		drives.map(async (drive) => {
-			await drive.update();
-			await drive.getBlobs();
+	// const [profile, contacts] = await Promise.all(
+	// 	drives.map(async (drive) => {
+	// 		await drive.update();
+	// 		await drive.getBlobs();
+	//
+	// 		const lengths = [drive.core.length, drive.blobs.core.length];
+	// 		const keys = [
+	// 			b4a.toString(drive.key, 'hex'),
+	// 			b4a.toString(drive.blobs.core.key, 'hex'),
+	// 		];
+	//
+	// 		drive.close();
+	//
+	// 		try {
+	// 			const [c1, c2] = await Promise.all(
+	// 				keys.map(async (key) => {
+	// 					const res = await fetch(
+	// 						__SLASHTAGS_SEEDER_BASE_URL__ + '/seeding/hypercore/' + key,
+	// 						{ method: 'GET' },
+	// 					);
+	// 					const status = await res.json();
+	//
+	// 					return {
+	// 						seeded: status.statusCode !== 404,
+	// 						length: status.length ?? 0,
+	// 					};
+	// 				}),
+	// 			);
+	//
+	// 			return (
+	// 				c1.seeded &&
+	// 				c2.seeded &&
+	// 				c1.length === lengths[0] &&
+	// 				c2.length === lengths[1]
+	// 			);
+	// 		} catch (e) {
+	// 			console.log('seeder request error: ', e.message);
+	// 			return false;
+	// 		}
+	// 	}),
+	// );
 
-			const lengths = [drive.core.length, drive.blobs.core.length];
-			const keys = [
-				b4a.toString(drive.key, 'hex'),
-				b4a.toString(drive.blobs.core.key, 'hex'),
-			];
-
-			drive.close();
-
-			try {
-				const [c1, c2] = await Promise.all(
-					keys.map(async (key) => {
-						const res = await fetch(
-							__SLASHTAGS_SEEDER_BASE_URL__ + '/seeding/hypercore/' + key,
-							{ method: 'GET' },
-						);
-						const status = await res.json();
-
-						return {
-							seeded: status.statusCode !== 404,
-							length: status.length ?? 0,
-						};
-					}),
-				);
-
-				return (
-					c1.seeded &&
-					c2.seeded &&
-					c1.length === lengths[0] &&
-					c2.length === lengths[1]
-				);
-			} catch (e) {
-				console.log('seeder request error: ', e.message);
-				return false;
-			}
-		}),
-	);
-
+	// TODO(slashtags): should we add this to salshtag.setContact() ?
 	return {
-		profile,
-		contacts,
+		profile: !!drives,
+		contacts: true,
 	};
 };

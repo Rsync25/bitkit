@@ -1,5 +1,6 @@
 import { err, ok, Result } from '@synonymdev/result';
 import lm, { ENetworks, TLdkData } from '@synonymdev/react-native-ldk';
+import type { Slashtag } from '@synonymdev/slashtags-sdk';
 
 import actions from './actions';
 import { getBackupStore, getDispatch } from '../helpers';
@@ -10,7 +11,6 @@ import {
 	uploadBackup,
 } from '../../utils/backup/backpack';
 import { bytesToString, stringToBytes } from '../../utils/converters';
-import { Slashtag } from '../../hooks/slashtags';
 import {
 	exportBackup,
 	setAccount,

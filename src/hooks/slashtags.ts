@@ -1,26 +1,22 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
-import SDK, { SlashURL } from '@synonymdev/slashtags-sdk';
+import { Slashtag, SlashURL } from '@synonymdev/slashtags-sdk';
+import type { Profile } from '@synonymdev/slashtags-profile';
 
 import { useSlashtags, useSlashtagsSDK } from '../components/SlashtagsProvider';
-import { BasicProfile, IRemote } from '../store/types/slashtags';
-import { decodeJSON, getSelectedSlashtag } from '../utils/slashtags';
+import { BasicProfile } from '../store/types/slashtags';
+import { getSelectedSlashtag } from '../utils/slashtags';
 import Store from '../store/types';
 import { cacheProfile } from '../store/actions/slashtags';
-
-export type Slashtag = ReturnType<SDK['slashtag']>;
 
 /**
  * Returns the currently selected Slashtag
  */
-export const useSelectedSlashtag = (): {
-	url: string;
-	slashtag: Slashtag;
-} & IRemote => {
+export const useSelectedSlashtag = (): Slashtag => {
 	const sdk = useSlashtagsSDK();
 	const slashtag = getSelectedSlashtag(sdk);
 
-	return { url: slashtag?.url, slashtag };
+	return slashtag;
 };
 
 /**
@@ -38,7 +34,7 @@ export const useProfile = (
 		resolve?: boolean;
 	},
 ): { resolving: boolean; profile: BasicProfile } => {
-	const sdk = useSlashtagsSDK();
+	const slashtag = useSelectedSlashtag();
 	const contactRecord = useSlashtags().contacts[url];
 	const [resolving, setResolving] = useState(true);
 	const profile = useSelector((state: Store) => {
@@ -64,44 +60,31 @@ export const useProfile = (
 		}
 
 		let unmounted = false;
-		if (sdk.closed) {
-			console.debug('useProfile: SKIP sdk is closed');
-			return;
+
+		const isRemote = SlashURL.parse(url).id !== SlashURL.parse(slashtag.url).id;
+
+		if (isRemote) {
+			slashtag.profile.readRemote(url).then(onProfile).catch(onError);
+		} else {
+			slashtag.profile.read().then(onProfile).catch(onError);
 		}
 
-		const drive = sdk.drive(SlashURL.parse(url).key);
+		const unsubscribe = slashtag.profile.subscribe(url, onProfile);
 
-		drive
-			.ready()
-			.then(() => {
-				// Resolve immediatly
-				resolve().finally(() => {
-					!unmounted && setResolving(false);
-				});
-				// Watch update
-				drive.core.on('append', resolve);
-			})
-			.catch(onError);
-
-		async function resolve(): Promise<void> {
-			const version = await drive.files
-				.get('/profile.json')
-				.then((node: any) => node?.seq);
-
-			const _profile = await drive
-				.get('/profile.json')
-				.then(decodeJSON)
-				.catch(noop);
-
-			cacheProfile(url, drive.files.feed.fork, version, _profile);
+		function onProfile(p: Profile | null): void {
+			if (p) {
+				cacheProfile(url, p);
+			}
+			if (!unmounted && resolving) {
+				setResolving(false);
+			}
 		}
 
 		return function cleanup(): void {
 			unmounted = true;
-			drive.core.removeAllListeners();
-			drive.close();
+			unsubscribe();
 		};
-	}, [url, sdk, shouldResolve]);
+	}, [url, slashtag, shouldResolve, resolving]);
 
 	return {
 		resolving,
@@ -112,5 +95,3 @@ export const useProfile = (
 function onError(error: Error): void {
 	console.debug('Error opening drive in useProfile', error.message);
 }
-
-function noop(): void {}

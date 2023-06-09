@@ -7,7 +7,7 @@ import b4a from 'b4a';
 
 import {
 	__DISABLE_SLASHTAGS__,
-	__SLASHTAGS_SEEDER_TOPIC__,
+	__SLASHTAGS_SEEDER_PUBLICKEY__,
 } from '../constants/env';
 import { storage as mmkv } from '../store/mmkv-storage';
 import { IContactRecord } from '../store/types/slashtags';
@@ -17,7 +17,6 @@ import {
 	getSelectedSlashtag,
 	onSDKError,
 } from '../utils/slashtags';
-import { updateSeederMaybe } from '../store/actions/slashtags';
 import { seedHashSelector } from '../store/reselect/wallet';
 
 export const RAWS = RAWSFactory({
@@ -46,6 +45,11 @@ const SlashtagsContext = createContext<ISlashtagsContext>({
 });
 
 const RECONNECT_DHT_RELAY_INTERVAL = 1000 * 2;
+
+let seeders: Uint8Array[];
+try {
+	seeders = [Buffer.from(__SLASHTAGS_SEEDER_PUBLICKEY__, 'hex')];
+} catch {}
 
 /**
  * All things Slashtags that needs to happen on start of Bitkit
@@ -109,6 +113,7 @@ export const SlashtagsProvider = ({
 				// TODO(slashtags): add settings to customize this relay or use native
 				// @ts-ignore
 				relay,
+				seeders,
 			});
 
 			if (unmounted) {
@@ -169,22 +174,16 @@ export const SlashtagsProvider = ({
 				return;
 			}
 
-			// Hardcode a single topic to connect to the seeder
-			// seeder this way won't need to announce O(n) topics.
-			const topic = b4a.from(__SLASHTAGS_SEEDER_TOPIC__, 'hex');
-			sdk.swarm.join(topic, { server: false, client: true });
-
 			// Increase swarm sockets max event listeners
+			// TODO(slashtags): check if this is still needed
 			sdk.swarm.on('connection', (socket: any) => socket.setMaxListeners(1000));
 
 			const slashtag = getSelectedSlashtag(sdk);
 
-			// Send cores to seeder
-			updateSeederMaybe(slashtag).catch(onError);
-
 			// Update contacts
 
 			// Load contacts from contacts drive on first loading of the app
+			// TODO(slashtags): convert to use core-data module
 			const contactsDrive = slashtag.drivestore.get('contacts');
 			contactsDrive
 				.ready()

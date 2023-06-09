@@ -23,8 +23,8 @@ const ContactEdit = ({
 	const { t } = useTranslation('slashtags');
 	const url = route.params.url;
 	const savedContact = useSlashtags().contacts[url];
-	const { slashtag } = useSelectedSlashtag();
-	const contact = useProfile(url, { resolve: !savedContact });
+	const slashtag = useSelectedSlashtag();
+	const contact = useProfile(url, { resolve: true });
 	const [form, setForm] = useState<BasicProfile>(savedContact || {});
 
 	const profile = useMemo(

@@ -1,5 +1,6 @@
 import { InteractionManager } from 'react-native';
 import { err, ok, Result } from '@synonymdev/result';
+import type { Slashtag } from '@synonymdev/slashtags-sdk';
 
 import {
 	generateMnemonic,
@@ -22,7 +23,6 @@ import { setupBlocktank, watchPendingOrders } from '../blocktank';
 import { removeExpiredLightningInvoices } from '../../store/actions/lightning';
 import { updateSlashPayConfig } from '../slashtags';
 import { sdk } from '../../components/SlashtagsProvider';
-import { Slashtag } from '../../hooks/slashtags';
 import { performFullRestoreFromLatestBackup } from '../../store/actions/backup';
 import { promiseTimeout } from '../helpers';
 import { TAvailableNetworks } from '../networks';

@@ -1,12 +1,7 @@
 import { EAddressType } from './wallet';
+import type { Profile } from '@synonymdev/slashtags-profile';
 
-// TODO(slashtags): move this interface to the Slashtags SDK once its stable?
-export type BasicProfile = Partial<{
-	name: string;
-	bio: string;
-	image: string;
-	links: Array<Link>;
-}>;
+export type BasicProfile = Profile;
 
 /** Contact Record saved in the "contacts" SlashDrive */
 export type IContactRecord = { url: string; name: string } & BasicProfile;
