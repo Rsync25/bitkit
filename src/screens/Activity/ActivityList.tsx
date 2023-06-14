@@ -93,8 +93,8 @@ const ActivityList = ({
 					testID={`Activity-${index}`}
 					key={item.id}
 					item={item}
-					onPress={(): void => {
-						navigation.navigate('ActivityDetail', { id: item.id });
+					onPress={(data: IActivityItem | undefined): void => {
+						navigation.navigate('ActivityDetail', { item: data ?? item });
 					}}
 				/>
 			);

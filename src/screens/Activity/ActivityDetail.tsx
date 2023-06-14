@@ -72,10 +72,7 @@ import {
 	EBoostType,
 	EBalanceUnit,
 } from '../../store/types/wallet';
-import {
-	activityItemSelector,
-	activityItemsSelector,
-} from '../../store/reselect/activity';
+import { activityItemsSelector } from '../../store/reselect/activity';
 import {
 	deleteMetaTxTag,
 	deleteMetaSlashTagsUrlTag,
@@ -146,6 +143,27 @@ const ZigZag = ({ color }: { color: string }): ReactElement => {
 	return <Path path={path} color={color} />;
 };
 
+const Icon = ({
+	isSend,
+	sentToSelf,
+}: {
+	isSend: boolean;
+	sentToSelf: boolean;
+}): ReactElement => {
+	if (sentToSelf) {
+		return <Title color="gray1">Sent to Self</Title>;
+	}
+	return (
+		<ThemedView style={styles.iconContainer} color="brand16">
+			{isSend ? (
+				<SendIcon height={19} color="brand" />
+			) : (
+				<ReceiveIcon height={19} color="brand" />
+			)}
+		</ThemedView>
+	);
+};
+
 const OnchainActivityDetail = ({
 	item,
 	navigation,
@@ -168,6 +186,11 @@ const OnchainActivityDetail = ({
 		address,
 		exists,
 	} = item;
+	//Old versions will not have matchedInputValue info stored here. Keep the optional chaining/ternary condition for safety.
+	const matchedInputValue = item?.matchedInputValue ?? 0;
+	const displayValue =
+		!value && matchedInputValue ? matchedInputValue : item.value;
+	const sentToSelf = item.value === 0;
 
 	const { t } = useTranslation('wallet');
 	const contacts = useSlashtags().contacts as { [url: string]: IContactRecord };
@@ -231,7 +254,7 @@ const OnchainActivityDetail = ({
 		(parentTxId) => {
 			const activityItem = activityItems.find((i) => i.id === parentTxId);
 			if (activityItem) {
-				navigation.push('ActivityDetail', { id: activityItem.id });
+				navigation.push('ActivityDetail', { item: activityItem });
 			}
 		},
 		[activityItems, navigation],
@@ -270,7 +293,7 @@ const OnchainActivityDetail = ({
 
 	const handleExplore = (): void => {
 		navigation.push('ActivityDetail', {
-			id: item.id,
+			item,
 			extended: true,
 		});
 	};
@@ -345,23 +368,20 @@ const OnchainActivityDetail = ({
 	return (
 		<>
 			<Money
-				sats={value}
+				sats={displayValue}
 				unit={EBalanceUnit.fiat}
 				size="caption13Up"
 				color="gray1"
 			/>
 			<View style={styles.title}>
 				<View style={styles.titleBlock}>
-					<Money sats={value} sign={isSend ? '- ' : '+ '} />
+					<Money
+						sats={displayValue}
+						sign={sentToSelf ? '' : isSend ? '- ' : '+ '}
+					/>
 				</View>
 
-				<ThemedView style={styles.iconContainer} color="brand16">
-					{isSend ? (
-						<SendIcon height={19} color="brand" />
-					) : (
-						<ReceiveIcon height={19} color="brand" />
-					)}
-				</ThemedView>
+				<Icon sentToSelf={sentToSelf} isSend={isSend} />
 			</View>
 
 			{!extended ? (
@@ -632,7 +652,7 @@ const LightningActivityDetail = ({
 
 	const handleExplore = (): void => {
 		navigation.push('ActivityDetail', {
-			id: item.id,
+			item,
 			extended: true,
 		});
 	};
@@ -857,12 +877,9 @@ const ActivityDetail = ({
 }: RootStackScreenProps<'ActivityDetail'>): ReactElement => {
 	const { t } = useTranslation('wallet');
 	const extended = route.params.extended ?? false;
+	const item = route.params.item;
 	const colors = useColors();
 	const [size, setSize] = useState({ width: 0, height: 0 });
-
-	const item = useAppSelector((state) => {
-		return activityItemSelector(state, route.params.id)!;
-	});
 
 	// if (!item) {
 	// 	return <></>;

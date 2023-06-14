@@ -31,7 +31,7 @@ export type RootStackParamList = {
 	RootAuthCheck: { onSuccess: () => void };
 	Wallet: NavigatorScreenParams<WalletStackParamList> | undefined;
 	Biometrics: undefined;
-	ActivityDetail: { id: IActivityItem['id']; extended?: boolean };
+	ActivityDetail: { item: IActivityItem; extended?: boolean };
 	ActivityAssignContact: { txid: string };
 	Scanner: { onScan: (data: string) => void } | undefined;
 	LightningRoot: NavigatorScreenParams<LightningStackParamList>;

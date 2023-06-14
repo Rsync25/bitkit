@@ -46,6 +46,9 @@ export const onChainTransactionToActivityItem = ({
 		);
 	});
 
+	const matchedInputValue = btcToSats(transaction.matchedInputValue);
+	const matchedOutputValue = btcToSats(transaction.matchedOutputValue);
+
 	return {
 		exists: true,
 		id: transaction.txid,
@@ -59,6 +62,8 @@ export const onChainTransactionToActivityItem = ({
 		confirmed: transaction.height > 0,
 		isBoosted: false,
 		isTransfer: isTransferToSavings || isTransferToSpending,
+		matchedInputValue,
+		matchedOutputValue,
 		timestamp: transaction.timestamp,
 		confirmTimestamp: transaction.confirmTimestamp,
 	};

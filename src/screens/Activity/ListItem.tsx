@@ -76,9 +76,11 @@ export const ListItem = ({
 const OnchainListItem = ({
 	item,
 	icon,
+	sentToSelf = false,
 }: {
 	item: TOnchainActivityItem;
 	icon: JSX.Element;
+	sentToSelf?: boolean;
 }): ReactElement => {
 	const { t } = useTranslation('wallet');
 	const {
@@ -141,6 +143,14 @@ const OnchainListItem = ({
 					<TransferIcon height={13} color="brand" />
 				</ThemedView>
 			);
+		}
+	}
+
+	if (sentToSelf) {
+		if (txType === EPaymentType.sent) {
+			title = 'Sent To Self';
+		} else {
+			title = 'Received From Self';
 		}
 	}
 
@@ -221,7 +231,7 @@ const ActivityListItem = ({
 	testID,
 }: {
 	item: IActivityItem;
-	onPress: () => void;
+	onPress: (data?: IActivityItem) => void;
 	testID?: string;
 }): ReactElement => {
 	const { id, activityType, txType } = item;
@@ -241,8 +251,67 @@ const ActivityListItem = ({
 		</ThemedView>
 	);
 
+	//Check if was sent to self.
+	if (activityType === EActivityType.onchain && item.value === 0) {
+		const sendItem: TOnchainActivityItem = {
+			...item,
+			txType: EPaymentType.sent,
+			value: item?.matchedInputValue ? item.matchedInputValue : 0,
+		};
+		const receiveItem: TOnchainActivityItem = {
+			...item,
+			txType: EPaymentType.received,
+			value: item?.matchedInputValue ? item.matchedInputValue : 0,
+		};
+		const sendIcon = (
+			<ThemedView style={styles.icon} color={'brand16'}>
+				<SendIcon height={13} color={'brand'} />
+			</ThemedView>
+		);
+		const receiveIcon = (
+			<ThemedView style={styles.icon} color={'brand16'}>
+				<ReceiveIcon height={13} color={'brand'} />
+			</ThemedView>
+		);
+
+		const sendItemOnPress = (): void => {
+			onPress(sendItem);
+		};
+		const receiveItemOnPress = (): void => {
+			onPress(receiveItem);
+		};
+
+		return (
+			<>
+				<TouchableOpacity
+					style={styles.root}
+					onPress={receiveItemOnPress}
+					testID={testID}>
+					<OnchainListItem
+						item={receiveItem}
+						icon={receiveIcon}
+						sentToSelf={true}
+					/>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.root}
+					onPress={sendItemOnPress}
+					testID={testID}>
+					<OnchainListItem item={sendItem} icon={sendIcon} sentToSelf={true} />
+				</TouchableOpacity>
+			</>
+		);
+	}
+
+	const defaultOnPress = (): void => {
+		onPress();
+	};
+
 	return (
-		<TouchableOpacity style={styles.root} onPress={onPress} testID={testID}>
+		<TouchableOpacity
+			style={styles.root}
+			onPress={defaultOnPress}
+			testID={testID}>
 			{activityType === EActivityType.onchain && (
 				<OnchainListItem item={item} icon={icon} />
 			)}
